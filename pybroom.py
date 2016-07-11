@@ -2,7 +2,7 @@ import pandas as pd
 import lmfit
 
 
-def tidy(result):
+def tidy(result, **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
 
     Returns:
@@ -11,13 +11,15 @@ def tidy(result):
         standard error, eventual bounds/constrains, etc.
     """
     # Find out what result is and call the relevant function
-    if isinstance(result, lmfit.model.ModelResult):
+    if isinstance(result, list):
+        return _multi_dataframe(result, tidy, **kwargs)
+    elif isinstance(result, lmfit.model.ModelResult):
         return _tidy_lmfit_modelresult(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
 
-def glance(result):
+def glance(result, **kwargs):
     """Tidy DataFrame containing fit summaries from`result`.
 
     Returns:
@@ -25,13 +27,15 @@ def glance(result):
         Columns include fit summaries such as reduced chi-square,
         number of evaluation, successful convergence, AIC, BIC, etc.
     """
-    if isinstance(result, lmfit.model.ModelResult):
+    if isinstance(result, list):
+        return _multi_dataframe(result, glance, **kwargs)
+    elif isinstance(result, lmfit.model.ModelResult):
         return _glance_lmfit_modelresult(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
 
-def augment(result):
+def augment(result, **kwargs):
     """Tidy DataFrame containing fit data from `result`.
 
     Returns:
@@ -39,10 +43,22 @@ def augment(result):
         It contains the input data, the model evaluated at the data points
         with best fitted parameters, error ranges, etc.
     """
-    if isinstance(result, lmfit.model.ModelResult):
+    if isinstance(result, list):
+        return _multi_dataframe(result, augment, **kwargs)
+    elif isinstance(result, lmfit.model.ModelResult):
         return _augment_lmfit_modelresult(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
+
+
+def _multi_dataframe(results, func, var_name='item'):
+    """Call `func` for each element in `results` and concatenate results.
+    """
+    d = []
+    for i, res in enumerate(results):
+        d.append(func(res))
+        d[-1][var_name] = i
+    return pd.concat(d, ignore_index=True)
 
 
 def _tidy_lmfit_modelresult(result):
