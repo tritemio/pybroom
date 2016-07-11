@@ -9,11 +9,13 @@ in tidy format
 [(Wickham 2014)](http://dx.doi.org/10.18637/jss.v059.i10).
 The tidy format creates an uniform interface to fit results and allows to
 cleanly combine results from different fits (e.g. comparison of different
-models, comparison of different datasets, etc.). Tidy DataFrames can be
-much more easily plotted with
+models, comparison of different datasets, etc.). Moreover, tidy DataFrames
+can be easily and systematically plotted with
 [seaborn](https://web.stanford.edu/~mwaskom/software/seaborn/) (and, increasingly,
 [matplotlib](http://matplotlib.org/)).
 
 Like broom, pybroom provides only 3 functions: `tidy`, `augment` and `glance`.
+For usage example see this
+[example notebook](pybroom-example.ipynb).
 For more information refer to the [broom](https://github.com/dgrtwo/broom)
 homepage and this [video presentation](https://www.youtube.com/watch?v=eM3Ha0kTAz4).
