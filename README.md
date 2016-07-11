@@ -21,5 +21,8 @@ Like broom, pybroom provides only 3 functions: `tidy`, `augment` and `glance`.
 For usage example see the included notebooks (read them executed
 [here](https://gist.github.com/tritemio/be72c6e8bef36031af14a610b1303c26) and 
 [here](https://gist.github.com/tritemio/aca5fb2f3de4dbfa46e8ee04efe067cd)).
-For more information refer to the [broom homepage](https://github.com/dgrtwo/broom)
-and to this [video presentation](https://www.youtube.com/watch?v=eM3Ha0kTAz4).
+
+I was inspired to start pybroom after watching this presentation by
+David Robinson (broom's author):
+
+- [broom: Converting statistical models to tidy data frames](https://www.youtube.com/watch?v=eM3Ha0kTAz4).
