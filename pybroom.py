@@ -13,8 +13,9 @@ def tidy(result, **kwargs):
     # Find out what result is and call the relevant function
     if isinstance(result, list):
         return _multi_dataframe(result, tidy, **kwargs)
-    elif isinstance(result, lmfit.model.ModelResult):
-        return _tidy_lmfit_modelresult(result)
+    elif (isinstance(result, lmfit.model.ModelResult) or
+          isinstance(result, lmfit.minimizer.MinimizerResult)):
+        return _tidy_lmfit_result(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
@@ -29,8 +30,9 @@ def glance(result, **kwargs):
     """
     if isinstance(result, list):
         return _multi_dataframe(result, glance, **kwargs)
-    elif isinstance(result, lmfit.model.ModelResult):
-        return _glance_lmfit_modelresult(result)
+    elif (isinstance(result, lmfit.model.ModelResult) or
+          isinstance(result, lmfit.minimizer.MinimizerResult)):
+        return _glance_lmfit_result(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
@@ -61,7 +63,7 @@ def _multi_dataframe(results, func, var_name='item'):
     return pd.concat(d, ignore_index=True)
 
 
-def _tidy_lmfit_modelresult(result):
+def _tidy_lmfit_result(result):
     """Make a "tidy" view of `lmfit.model.ModelResult`.
     """
     params_attrs = ['name', 'value', 'min', 'max', 'vary', 'expr', 'stderr']
@@ -76,7 +78,7 @@ def _tidy_lmfit_modelresult(result):
     return d
 
 
-def _glance_lmfit_modelresult(result):
+def _glance_lmfit_result(result):
     """Make a "glance" view of `lmfit.model.ModelResult`.
     """
     result_attrs = ['method', 'nvarys', 'ndata', 'chisqr', 'redchi',
@@ -88,13 +90,16 @@ def _glance_lmfit_modelresult(result):
     attrs_map['nfev'] = 'num_func_eval'
     attrs_map['ndata'] = 'num_data_points'
 
-    columns = ['name'] + [attrs_map[n] for n in result_attrs]
+    columns = [attrs_map[n] for n in result_attrs]
+    # ModelResult has attribute "name", MinimizerResult does not
+    if hasattr(result, 'name'):
+        columns.insert(0, 'name')
     d = pd.DataFrame(index=range(1), columns=columns)
     for name in result_attrs:
         d.loc[0, attrs_map[name]] = getattr(result, name)
-
-    d.loc[0, 'name'] = result.model.name
-    #d.loc[0, 'num_components'] = len(result.components)
+    if hasattr(result, 'name'):
+        d.loc[0, 'name'] = result.model.name
+        #d.loc[0, 'num_components'] = len(result.components)
     return d
 
 
