@@ -6,7 +6,7 @@ def tidy(result, **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
 
     Returns:
-        A DataFrame with one row for each fitted paramater.
+        A DataFrame with one row for each fitted parameter.
         Columns include parameter properties such as best-fit value,
         standard error, eventual bounds/constrains, etc.
     """
@@ -64,7 +64,7 @@ def _multi_dataframe(results, func, var_name='item'):
 
 
 def _tidy_lmfit_result(result):
-    """Make a "tidy" view of `lmfit.model.ModelResult`.
+    """Tidy parameters from lmfit `ModelResult` or `MinimizerResult`.
     """
     params_attrs = ['name', 'value', 'min', 'max', 'vary', 'expr', 'stderr']
     columns = params_attrs + ['init_value']
@@ -79,7 +79,7 @@ def _tidy_lmfit_result(result):
 
 
 def _glance_lmfit_result(result):
-    """Make a "glance" view of `lmfit.model.ModelResult`.
+    """Tidy summary statistics from lmfit `ModelResult` or `MinimizerResult`.
     """
     result_attrs = ['method', 'nvarys', 'ndata', 'chisqr', 'redchi',
                     'aic', 'bic', 'nfev', 'success', 'message']
@@ -104,7 +104,7 @@ def _glance_lmfit_result(result):
 
 
 def _augment_lmfit_modelresult(result):
-    """Make a "glance" view of `lmfit.model.ModelResult`.
+    """Tidy data values and fitted model from `lmfit.model.ModelResult`.
     """
     columns = ['x', 'data', 'best_fit', 'residual']
     d = pd.DataFrame(index=range(result.ndata), columns=columns)
