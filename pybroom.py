@@ -5,6 +5,8 @@
 import pandas as pd
 import lmfit
 
+__version__ = '0.1dev'
+
 
 def tidy(result, **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
