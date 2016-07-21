@@ -1,3 +1,7 @@
+#
+# Copyright (c) 2016 Antonino Ingargiola and contributors.
+#
+
 import pandas as pd
 import lmfit
 
@@ -136,8 +140,8 @@ def tidy_to_dict(df, key='name', value='value', keys_exclude=None,
     This function converts two columns from an input tidy (or long-form)
     DataFrame into a dictionary. A typical use-case is passing
     parameters stored in tidy DataFrame to a python function. The arguments
-    `key` and `value` contain the name of the DataFrame columns containing,
-    respectively, the keys and the values of the dictionary.
+    `key` and `value` contain the name of the DataFrame columns containing
+    the keys and the values of the dictionary.
 
     Arguments:
         df (pandas.DataFrame): the "tidy" DataFrame containing the data.
@@ -147,12 +151,13 @@ def tidy_to_dict(df, key='name', value='value', keys_exclude=None,
             the keys of the dictionary.
         value (string or scalar ): name of the DataFrame column containing
             the values of the dictionary.
-        keys_exclude (iterable or None): list of keys not to be included in
+        keys_exclude (iterable or None): list of keys excluded when building
             the returned dictionary.
-        cast_value (callable, e.g. float, or None): callable used to cast
+        cast_value (callable or None): callable used to cast
             the value of each item in the dictionary. If None, no casting
             is performed and the resulting values are 1-element
-            `pandas.Series`. Typical values include: `float`, `int` and `str`.
+            `pandas.Series`. Default is the python built-in `float`.
+            Other typical values may be `int` or `str`.
 
     Returns:
         A dictionary with keys and values extracted from the input (tidy)
@@ -184,9 +189,8 @@ def dict_to_tidy(dc, key='name', value='value', keys_exclude=None,
             the keys of the dictionary.
         value (string or scalar ): name of the DataFrame column containing
             the values of the dictionary.
-        keys_exclude (iterable or None): list of keys in the input
-            dictionary not be included in the DataFrame.
-
+        keys_exclude (iterable or None): list of keys excluded when building
+            the returned DataFrame.
 
     Returns:
         A two-columns tidy DataFrame containing the data in the dictionary.
