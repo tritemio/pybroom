@@ -2,6 +2,7 @@
 # Copyright (c) 2016 Antonino Ingargiola and contributors.
 #
 
+from collections import OrderedDict
 import pandas as pd
 import lmfit
 
@@ -38,7 +39,7 @@ def glance(result, **kwargs):
         return _multi_dataframe(result, glance, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
-        return _glance_lmfit_result(result)
+        return glance_lmfit_result(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
@@ -84,28 +85,53 @@ def _tidy_lmfit_result(result):
     return d
 
 
-def _glance_lmfit_result(result):
-    """Tidy summary statistics from lmfit `ModelResult` or `MinimizerResult`.
+def glance_lmfit_result(result):
+    """Tidy summary statistics from lmfit's `ModelResult` or `MinimizerResult`.
+
+    Arguments:
+        result (`ModelResult` or `MinimizerResult`): the fit result object.
+
+    Returns:
+        A DataFrame in tidy format with one row and several summary statistics
+        as columns.
+
+    Note:
+        The columns of the returned DataFrame are:
+
+        - `model` (string): model name (only for `ModelResult`)
+        - `method` (string): method used for the optimization (e.g. `leastsq`).
+        - `num_params` (int): number of varied parameters
+        - `ndata` (int):
+        - `chisqr` (float): chi-square statistics.
+        - `redchi` (float): reduced chi-square statistics.
+        - `AIC` (float): Akaike Information Criterion statistics.
+        - `BIC` (float): Bayes Information Criterion statistics.
+        - `num_func_eval` (int): number of evaluations of the objective
+          function during the fit.
+        - `num_data_points` (int): number of data points (e.g. samples) used
+          for the fit.
+
     """
-    result_attrs = ['method', 'nvarys', 'ndata', 'chisqr', 'redchi',
+    def _is_modelresult(res):
+        return hasattr(res, 'model')
+    result_attrs = ['name', 'method', 'nvarys', 'ndata', 'chisqr', 'redchi',
                     'aic', 'bic', 'nfev', 'success', 'message']
-    attrs_map = {n: n for n in result_attrs}
+    attrs_map = OrderedDict((n, n) for n in result_attrs)
+    attrs_map['name'] = 'model'
     attrs_map['aic'] = 'AIC'
     attrs_map['bic'] = 'BIC'
     attrs_map['nvarys'] = 'num_params'
     attrs_map['nfev'] = 'num_func_eval'
     attrs_map['ndata'] = 'num_data_points'
-
-    columns = [attrs_map[n] for n in result_attrs]
-    # ModelResult has attribute "name", MinimizerResult does not
-    if hasattr(result, 'name'):
-        columns.insert(0, 'name')
-    d = pd.DataFrame(index=range(1), columns=columns)
+    # ModelResult has attribute `.model.name`, MinimizerResult does not
+    if not _is_modelresult(result):
+        attrs_map.pop('name')
+    d = pd.DataFrame(index=range(1), columns=attrs_map.values())
+    if _is_modelresult(result):
+        d.loc[0, attrs_map.pop('name')] = result.model.name
     for name in result_attrs:
         d.loc[0, attrs_map[name]] = getattr(result, name)
-    if hasattr(result, 'name'):
-        d.loc[0, 'name'] = result.model.name
-        #d.loc[0, 'num_components'] = len(result.components)
+    #d.loc[0, 'num_components'] = len(result.components)
     return d
 
 
@@ -189,13 +215,14 @@ def dict_to_tidy(dc, key='name', value='value', keys_exclude=None,
         dc (dict): the input dictionary used to build the DataFrame.
         key (string or scalar): name of the DataFrame column containing
             the keys of the dictionary.
-        value (string or scalar ): name of the DataFrame column containing
+        value (string or scalar): name of the DataFrame column containing
             the values of the dictionary.
         keys_exclude (iterable or None): list of keys excluded when building
             the returned DataFrame.
 
     Returns:
         A two-columns tidy DataFrame containing the data in the dictionary.
+
 
     See also: :func:`tidy_to_dict`.
     """
