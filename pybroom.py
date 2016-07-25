@@ -22,7 +22,7 @@ def tidy(result, **kwargs):
         return _multi_dataframe(result, tidy, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
-        return _tidy_lmfit_result(result)
+        return tidy_lmfit_result(result)
     else:
         raise NotImplemented('Sorry, the data is not recognized.')
 
@@ -70,8 +70,28 @@ def _multi_dataframe(results, func, var_name='item'):
     return pd.concat(d, ignore_index=True)
 
 
-def _tidy_lmfit_result(result):
-    """Tidy parameters from lmfit `ModelResult` or `MinimizerResult`.
+def tidy_lmfit_result(result):
+    """Tidy parameters from lmfit's  `ModelResult` or `MinimizerResult`.
+
+    Arguments:
+        result (`ModelResult` or `MinimizerResult`): the fit result object.
+
+    Returns:
+        A DataFrame in tidy format with one row for each parameter.
+
+    Note:
+        The (possible) columns of the returned DataFrame are:
+
+        - `name` (string): name of the parameter.
+        - `value` (number): value of the parameter after the optimization.
+        - `init_value` (number): initial value of the parameter before the
+          optimization.
+        - `min`, `max` (numbers): number of varied parameters
+        - `vary` (bool): whether the parameter has been varied during the
+          optimization.
+        - `expr` (string): constraint expression for the parameter.
+        - `stderr` (float): standard error for the parameter.
+
     """
     params_attrs = ['name', 'value', 'min', 'max', 'vary', 'expr', 'stderr']
     columns = params_attrs + ['init_value']
