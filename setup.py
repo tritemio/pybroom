@@ -2,6 +2,15 @@ from setuptools import setup
 #import versioneer
 
 
+def get_version():
+    # http://stackoverflow.com/questions/2058802/how-can-i-get-the-version-defined-in-setup-py-setuptools-in-my-package
+    from ast import parse
+    with open('pybroom.py') as f:
+        version = parse(next(filter(
+            lambda line: line.startswith('__version__'), f))).body[0].value.s
+    return version
+
+
 long_description = """
 pybroom
 =======
@@ -23,7 +32,7 @@ can be easily and systematically plotted with
 
 setup(
     name='pybroom',
-    version='0.1',
+    version=get_version(),
     #version=versioneer.get_version(),
     #cmdclass=versioneer.get_cmdclass(),
     author='Antonino Ingargiola',
