@@ -9,17 +9,35 @@ import lmfit
 __version__ = '0.1dev'
 
 
-def tidy(result, **kwargs):
+def tidy(result, var_name='item', **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
+
+    A function to tidy any of the supported fit result
+    (or a list of fit results). This function will identify input type
+    and call the relative "specialized" tidying function. When the input
+    is a list, the returned DataFrame contains data from all the fit
+    results.
+
+    Arguments:
+        result (fit result object or list): one of the supported fit result
+            objects or a list of supported fit result objects. When a list,
+            all the elements need to be of the same type.
+        var_name (string): name of the column containing an integer index
+            that is different for each element in the list of fit results.
+        **kwargs: additional arguments passed to the underlying specialized
+            tidying function.
 
     Returns:
         A DataFrame with one row for each fitted parameter.
         Columns include parameter properties such as best-fit value,
         standard error, eventual bounds/constrains, etc.
+        When a list of fit-result objects is passed, the column `var_name`
+        (`'item'` by default) contains the index of the object
+        in the list.
     """
     # Find out what result is and call the relevant function
     if isinstance(result, list):
-        return _multi_dataframe(result, tidy, **kwargs)
+        return _multi_dataframe(result, tidy, var_name=var_name, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return tidy_lmfit_result(result)
@@ -27,16 +45,34 @@ def tidy(result, **kwargs):
         raise NotImplemented('Sorry, the data is not recognized.')
 
 
-def glance(result, **kwargs):
+def glance(result, var_name='item', **kwargs):
     """Tidy DataFrame containing fit summaries from`result`.
 
+    A function to tidy any of the supported fit result
+    (or a list of fit results). This function will identify input type
+    and call the relative "specialized" tidying function. When the input
+    is a list, the returned DataFrame contains data from all the fit
+    results.
+
+    Arguments:
+        result (fit result object or list): one of the supported fit result
+            objects or a list of supported fit result objects. When a list,
+            all the elements need to be of the same type.
+        var_name (string): name of the column containing an integer index
+            that is different for each element in the list of fit results.
+        **kwargs: additional arguments passed to the underlying specialized
+            tidying function.
+
     Returns:
-        A DataFrame with only one row and several columns.
+        A DataFrame with one row for each passed fit result.
         Columns include fit summaries such as reduced chi-square,
         number of evaluation, successful convergence, AIC, BIC, etc.
+        When a list of fit-result objects is passed, the column `var_name`
+        (`'item'` by default) contains the index of the object
+        in the list.
     """
     if isinstance(result, list):
-        return _multi_dataframe(result, glance, **kwargs)
+        return _multi_dataframe(result, glance, var_name=var_name, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return glance_lmfit_result(result)
@@ -44,16 +80,34 @@ def glance(result, **kwargs):
         raise NotImplemented('Sorry, the data is not recognized.')
 
 
-def augment(result, **kwargs):
+def augment(result, var_name='item', **kwargs):
     """Tidy DataFrame containing fit data from `result`.
+
+    A function to tidy any of the supported fit result
+    (or a list of fit results). This function will identify input type
+    and call the relative "specialized" tidying function. When the input
+    is a list, the returned DataFrame contains data from all the fit
+    results.
+
+    Arguments:
+        result (fit result object or list): one of the supported fit result
+            objects or a list of supported fit result objects. When a list,
+            all the elements need to be of the same type.
+        var_name (string): name of the column containing an integer index
+            that is different for each element in the list of fit results.
+        **kwargs: additional arguments passed to the underlying specialized
+            tidying function.
 
     Returns:
         A DataFrame with one row for each data point used in the fit.
         It contains the input data, the model evaluated at the data points
         with best fitted parameters, error ranges, etc.
+        When a list of fit-result objects is passed, the column `var_name`
+        (`'item'` by default) contains the index of the object
+        in the list.
     """
     if isinstance(result, list):
-        return _multi_dataframe(result, augment, **kwargs)
+        return _multi_dataframe(result, augment, var_name=var_name, **kwargs)
     elif isinstance(result, lmfit.model.ModelResult):
         return _augment_lmfit_modelresult(result)
     else:
