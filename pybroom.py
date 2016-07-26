@@ -34,6 +34,11 @@ def tidy(result, var_name='item', **kwargs):
         When a list of fit-result objects is passed, the column `var_name`
         (`'item'` by default) contains the index of the object
         in the list.
+
+    See also:
+        For more information on the returned DataFrame and on additional
+        arguments refer to the specialized tidying functions:
+        :func:`tidy_lmfit_result`.
     """
     # Find out what result is and call the relevant function
     if isinstance(result, list):
@@ -70,6 +75,11 @@ def glance(result, var_name='item', **kwargs):
         When a list of fit-result objects is passed, the column `var_name`
         (`'item'` by default) contains the index of the object
         in the list.
+
+    See also:
+        For more information on the returned DataFrame and on additional
+        arguments refer to the specialized tidying functions:
+        :func:`glance_lmfit_result`.
     """
     if isinstance(result, list):
         return _multi_dataframe(result, glance, var_name=var_name, **kwargs)
@@ -127,6 +137,9 @@ def _multi_dataframe(results, func, var_name='item'):
 def tidy_lmfit_result(result):
     """Tidy parameters from lmfit's  `ModelResult` or `MinimizerResult`.
 
+    Normally this function is not called directly but invoked by the
+    general purpose function :func:`tidy`.
+
     Arguments:
         result (`ModelResult` or `MinimizerResult`): the fit result object.
 
@@ -140,12 +153,11 @@ def tidy_lmfit_result(result):
         - `value` (number): value of the parameter after the optimization.
         - `init_value` (number): initial value of the parameter before the
           optimization.
-        - `min`, `max` (numbers): number of varied parameters
+        - `min`, `max` (numbers): bounds of the parameter
         - `vary` (bool): whether the parameter has been varied during the
           optimization.
         - `expr` (string): constraint expression for the parameter.
         - `stderr` (float): standard error for the parameter.
-
     """
     params_attrs = ['name', 'value', 'min', 'max', 'vary', 'expr', 'stderr']
     columns = params_attrs + ['init_value']
@@ -161,6 +173,9 @@ def tidy_lmfit_result(result):
 
 def glance_lmfit_result(result):
     """Tidy summary statistics from lmfit's `ModelResult` or `MinimizerResult`.
+
+    Normally this function is not called directly but invoked by the
+    general purpose function :func:`glance`.
 
     Arguments:
         result (`ModelResult` or `MinimizerResult`): the fit result object.
