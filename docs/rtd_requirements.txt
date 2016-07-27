@@ -1,0 +1,4 @@
+pandas>=0.18.1
+lmfit
+nbsphinx
+ipykernel

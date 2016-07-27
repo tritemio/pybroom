@@ -1,2 +1,2 @@
 pandas>=0.18.1
-lmfit
+lmfit>=0.9.5
