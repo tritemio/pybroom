@@ -218,8 +218,8 @@ def glance_lmfit_result(result):
     d = pd.DataFrame(index=range(1), columns=attrs_map.values())
     if _is_modelresult(result):
         d.loc[0, attrs_map.pop('name')] = result.model.name
-    for name in result_attrs:
-        d.loc[0, attrs_map[name]] = getattr(result, name)
+    for attr_name, df_name in attrs_map.items():
+        d.loc[0, df_name] = getattr(result, attr_name)
     #d.loc[0, 'num_components'] = len(result.components)
     return d
 
