@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
+   notebooks/pybroom-example.ipynb
    notebooks/pybroom-example-multi-datasets.ipynb
    api
 
