@@ -1,5 +1,7 @@
+sphinx>=1.4
 pandas>=0.18.1
 lmfit
 nbsphinx
 ipykernel
+matplotlib>=1.5.1
 seaborn
