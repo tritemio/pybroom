@@ -22,9 +22,9 @@ can be easily and systematically plotted with
 [matplotlib](http://matplotlib.org/)).
 
 Like broom, pybroom provides 3 functions: `tidy`, `augment` and `glance`.
-For usage example see the included notebooks (read them executed
-[here](https://gist.github.com/tritemio/be72c6e8bef36031af14a610b1303c26) and
-[here](https://gist.github.com/tritemio/aca5fb2f3de4dbfa46e8ee04efe067cd)).
+For usage example the [documentation](http://pybroom.readthedocs.io/) 
+which includes example notebooks (you can find the notebooks in 
+[docs/notebooks](docs/notebooks)). 
 Moreover, pybroom provides two functions `tidy_to_dict` and `dict_to_tidy`
 for conversion between dictionaries and 2-columns tidy DataFrame. These
 functions are useful to call python functions with parameters stored
