@@ -22,6 +22,12 @@ for conversion between dictionaries and 2-columns tidy DataFrame. These
 functions are useful to call python functions with parameters stored
 in tidy DataFrames or to create tidy DataFrames from plain dictionaries.
 
+Currently, supported fit result object are:
+- `lmfit.model.ModelResult` (returned by `lmfit.Model.fit()`)
+- `lmfit.minimizer.MinimizerResult` (returned by `lmfit.minimizer()`)
+
+Support for `scipy.optimize` or objects used in other libraries such as
+`sklearn` can be added based on user request (PR welcome!).
 
 I was inspired to start pybroom after watching this presentation by
 David Robinson (broom's author):
