@@ -22,7 +22,7 @@ can be easily and systematically plotted with
 [matplotlib](http://matplotlib.org/)).
 
 Like broom, pybroom provides 3 functions: `tidy`, `augment` and `glance`.
-For usage example the [documentation](http://pybroom.readthedocs.io/) 
+For usage example see the [documentation](http://pybroom.readthedocs.io/) 
 which includes example notebooks (you can find the notebooks in 
 [docs/notebooks](docs/notebooks)). 
 Moreover, pybroom provides two functions `tidy_to_dict` and `dict_to_tidy`
