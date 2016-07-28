@@ -6,18 +6,20 @@
 Welcome to pybroom's documentation!
 ===================================
 
-`pybroom` is the python "cousin" of the R library `broom <https://github.com/dgrtwo/broom>`__.
-
-Pybroom converts fitting results objects into `Pandas <http://pandas.pydata.org/>`__
+Pybroom is a small pure-python library for converting fitting results
+(curve fitting or other optimizations)
+to `Pandas <http://pandas.pydata.org/>`__
 `DataFrame <http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dataframe>`__
 in tidy format
 `(Wickham 2014) <http://dx.doi.org/10.18637/jss.v059.i10>`__.
-The tidy format is a uniform interface which allows to
-cleanly combine results from different fits (e.g. comparison of different
-models, comparison of different datasets, etc.). Moreover, tidy DataFrames
-can be easily and systematically plotted with
-`seaborn <https://web.stanford.edu/~mwaskom/software/seaborn/>`__ (and
-recent versions of `matplotlib <http://matplotlib.org/>`__).
+The tidy DataFrames are a uniform interface to
+easily combine results from different fits (e.g. comparison of different
+models, comparison of different datasets, bootstrap sampling etc.).
+Moreover, tidy DataFrames can be easily and systematically plotted with
+`seaborn <https://web.stanford.edu/~mwaskom/software/seaborn/>`__ and
+recent versions of `matplotlib <http://matplotlib.org/>`__
+(as well as with new libraries such as `altair <https://github.com/ellisonbg/altair>`__).
+`pybroom` was inspired by the R library `broom <https://github.com/dgrtwo/broom>`__.
 
 Like the R library broom, `pybroom` main API
 consists of only 3 functions: `tidy`, `augment` and `glance`.
