@@ -42,8 +42,6 @@ Install pybroom with `pip` from the source folder::
 Dependencies are only pandas and lmfit (0.9.5+). However, matplotlib and
 seaborn are strongly recommended.
 
-Documentation
--------------
 
 .. toctree::
    :maxdepth: 1
@@ -56,7 +54,7 @@ Documentation
 .. toctree::
     :maxdepth: 1
     :caption: Reference
-    
+
     api
 
 
