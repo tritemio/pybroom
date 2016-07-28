@@ -13,6 +13,7 @@ Contents:
 
    notebooks/pybroom-example.ipynb
    notebooks/pybroom-example-multi-datasets.ipynb
+   notebooks/pybroom-example-multi-datasets-minimize.ipynb
    api
 
 

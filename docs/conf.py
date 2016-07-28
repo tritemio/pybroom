@@ -38,6 +38,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.napoleon',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 nbsphinx_allow_errors = False
 
