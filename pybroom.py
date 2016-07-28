@@ -47,7 +47,8 @@ def tidy(result, var_name='item', **kwargs):
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return tidy_lmfit_result(result)
     else:
-        raise NotImplemented('Sorry, the data is not recognized.')
+        msg = 'Sorry, `tidy` does not support this fit result object (%s)'
+        raise NotImplementedError(msg % type(result))
 
 
 def glance(result, var_name='item', **kwargs):
@@ -87,7 +88,8 @@ def glance(result, var_name='item', **kwargs):
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return glance_lmfit_result(result)
     else:
-        raise NotImplemented('Sorry, the data is not recognized.')
+        msg = 'Sorry, `glance` does not support this fit result object (%s)'
+        raise NotImplementedError(msg % type(result))
 
 
 def augment(result, var_name='item', **kwargs):
@@ -121,7 +123,8 @@ def augment(result, var_name='item', **kwargs):
     elif isinstance(result, lmfit.model.ModelResult):
         return _augment_lmfit_modelresult(result)
     else:
-        raise NotImplemented('Sorry, the data is not recognized.')
+        msg = 'Sorry, `augment` does not support this fit result object (%s)'
+        raise NotImplementedError(msg % type(result))
 
 
 def _multi_dataframe(results, func, var_name='item'):
@@ -238,7 +241,7 @@ def _augment_lmfit_modelresult(result):
     else:
         msg = ('Only 1 independent variable is currently supported.\n'
                'Found independent variables: %s' % str(independent_vars))
-        raise NotImplemented(msg)
+        raise NotImplementedError(msg)
 
     x_array = result.userkws[independent_var]
     d.loc[:, 'x'] = x_array
