@@ -6,22 +6,24 @@
 Welcome to pybroom's documentation!
 ===================================
 
-Pybroom is a small pure-python library for converting fitting results
+:Latest Version: |version|
+
+**Pybroom** is a small python (3.4+) library for converting fitting results
 (curve fitting or other optimizations)
 to `Pandas <http://pandas.pydata.org/>`__
 `DataFrame <http://pandas.pydata.org/pandas-docs/stable/dsintro.html#dataframe>`__
 in tidy format
 `(Wickham 2014) <http://dx.doi.org/10.18637/jss.v059.i10>`__.
-The tidy DataFrames are a uniform interface to
-easily combine results from different fits (e.g. comparison of different
-models, comparison of different datasets, bootstrap sampling etc.).
-Moreover, tidy DataFrames can be easily and systematically plotted with
+The tidy DataFrames are a uniform interface which allows to
+easily combine results from different fits (e.g. comparing different
+models, different datasets, bootstrap samples, etc.).
+Moreover, tidy DataFrames can be easily plotted with
 `seaborn <https://web.stanford.edu/~mwaskom/software/seaborn/>`__ and
 recent versions of `matplotlib <http://matplotlib.org/>`__
 (as well as with new libraries such as `altair <https://github.com/ellisonbg/altair>`__).
-`pybroom` was inspired by the R library `broom <https://github.com/dgrtwo/broom>`__.
+pybroom was inspired by the R library `broom <https://github.com/dgrtwo/broom>`__.
 
-Like the R library broom, `pybroom` main API
+Like the R library broom, pybroom main API
 consists of only 3 functions: `tidy`, `augment` and `glance`.
 Additionally, pybroom provides two functions `tidy_to_dict` and `dict_to_tidy`
 for conversion between dictionaries and 2-columns tidy DataFrame.
@@ -32,7 +34,8 @@ Currently, supported fit result object are:
 - `lmfit.minimizer.MinimizerResult` (returned by `lmfit.minimizer()`)
 
 Support for `scipy.optimize` or objects used in other libraries such as
-`sklearn` can be added based on user request (PR welcome!).
+`sklearn` can be added based on user request
+(`PR welcome! <https://github.com/tritemio/pybroom>`__).
 
 Installation
 ------------
