@@ -1,6 +1,6 @@
 # pybroom
 
-> *Like a broom, but in python. Let's tidy messy fit results!*
+> *Like a broom, but in python. Let's tidy up messy fit results!*
 
 **Pybroom** is a small python 3 library for converting fitting results
 (curve fitting or other optimizations)
