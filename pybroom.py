@@ -224,6 +224,9 @@ def glance_lmfit_result(result):
     for attr_name, df_name in attrs_map.items():
         d.loc[0, df_name] = getattr(result, attr_name)
     #d.loc[0, 'num_components'] = len(result.components)
+    if hasattr(result, 'kws') and result.kws is not None:
+        for key, value in result.kws.items():
+            d['_'.join((result.method, key))] = value
     return d
 
 
