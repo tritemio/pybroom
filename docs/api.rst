@@ -35,6 +35,10 @@ Specialized functions
 These are the specialized (i.e. low-level) functions, each converting one
 specific object to a tidy DataFrame.
 
+.. autofunction :: glance_scipy_result
+
+.. autofunction :: tidy_scipy_result
+
 .. autofunction :: glance_lmfit_result
 
 .. autofunction :: tidy_lmfit_result

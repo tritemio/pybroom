@@ -2,8 +2,9 @@
 # Copyright (c) 2016 Antonino Ingargiola and contributors.
 #
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 import pandas as pd
+import scipy.optimize as so
 import lmfit
 
 __version__ = '0.1dev'
@@ -17,6 +18,8 @@ def tidy(result, var_name='item', **kwargs):
     and call the relative "specialized" tidying function. When the input
     is a list, the returned DataFrame contains data from all the fit
     results.
+    Supported fit result objects are `lmfit.ModelResult`,
+    `lmfit.MinimizeResult` and `scipy.optimize.OptimizeResult`.
 
     Arguments:
         result (fit result object or list): one of the supported fit result
@@ -24,6 +27,10 @@ def tidy(result, var_name='item', **kwargs):
             all the elements need to be of the same type.
         var_name (string): name of the column containing an integer index
             that is different for each element in the list of fit results.
+        param_names (string or list of string): names of the fitted parameters
+            for fit results which don't include parameter's names
+            (such as scipy's OptimizeResult). It can either be a list of
+            strings or a single string with space-separated names.
         **kwargs: additional arguments passed to the underlying specialized
             tidying function.
 
@@ -38,7 +45,7 @@ def tidy(result, var_name='item', **kwargs):
     See also:
         For more information on the returned DataFrame and on additional
         arguments refer to the specialized tidying functions:
-        :func:`tidy_lmfit_result`.
+        :func:`tidy_lmfit_result` and :func:`tidy_scipy_result`.
     """
     # Find out what result is and call the relevant function
     if isinstance(result, list):
@@ -46,6 +53,11 @@ def tidy(result, var_name='item', **kwargs):
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return tidy_lmfit_result(result)
+    elif isinstance(result, so.OptimizeResult):
+        if 'param_names' not in kwargs:
+            msg = "The argument `param_names` is required for this input type."
+            raise ValueError(msg)
+        return tidy_scipy_result(result, **kwargs)
     else:
         msg = 'Sorry, `tidy` does not support this fit result object (%s)'
         raise NotImplementedError(msg % type(result))
@@ -59,6 +71,8 @@ def glance(result, var_name='item', **kwargs):
     and call the relative "specialized" tidying function. When the input
     is a list, the returned DataFrame contains data from all the fit
     results.
+    Supported fit result objects are `lmfit.ModelResult`,
+    `lmfit.MinimizeResult` and `scipy.optimize.OptimizeResult`.
 
     Arguments:
         result (fit result object or list): one of the supported fit result
@@ -80,13 +94,15 @@ def glance(result, var_name='item', **kwargs):
     See also:
         For more information on the returned DataFrame and on additional
         arguments refer to the specialized tidying functions:
-        :func:`glance_lmfit_result`.
+        :func:`glance_lmfit_result` and :func:`glance_scipy_result`.
     """
     if isinstance(result, list):
         return _multi_dataframe(result, glance, var_name=var_name, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return glance_lmfit_result(result)
+    elif isinstance(result, so.OptimizeResult):
+        return glance_scipy_result(result, **kwargs)
     else:
         msg = 'Sorry, `glance` does not support this fit result object (%s)'
         raise NotImplementedError(msg % type(result))
@@ -127,12 +143,12 @@ def augment(result, var_name='item', **kwargs):
         raise NotImplementedError(msg % type(result))
 
 
-def _multi_dataframe(results, func, var_name='item'):
+def _multi_dataframe(results, func, var_name='item', **kwargs):
     """Call `func` for each element in `results` and concatenate results.
     """
     d = []
     for i, res in enumerate(results):
-        d.append(func(res))
+        d.append(func(res, **kwargs))
         d[-1][var_name] = i
     return pd.concat(d, ignore_index=True)
 
@@ -171,6 +187,70 @@ def tidy_lmfit_result(result):
         # Derived parameters may not have init value
         if name in result.init_values:
             d.loc[i, 'init_value'] = result.init_values[name]
+    return d
+
+
+def tidy_scipy_result(result, param_names, **kwargs):
+    """Tidy parameters data from scipy's `OptimizeResult`.
+
+    Normally this function is not called directly but invoked by the
+    general purpose function :func:`tidy`.
+    Since `OptimizeResult` has a raw array of fitted parameters
+    but no names, the parameters' names need to be passed in `param_names`.
+
+    Arguments:
+        result (`OptimizeResult`): the fit result object.
+        param_names (string or list of string): names of the fitted parameters.
+            It can either be a list of strings or a single string with
+            space-separated names.
+
+    Returns:
+        A DataFrame in tidy format with one row for each parameter.
+
+    Note:
+        The columns of the returned DataFrame are:
+
+        - `name` (string): name of the parameter.
+        - `value` (number): value of the parameter after the optimization.
+        - `grad` (float): gradient for each parameter
+        - `active_mask` (int)
+    """
+    Params = namedtuple('Params', param_names)
+    params = Params(*result.x)
+    df = dict_to_tidy(params._asdict(), **kwargs)
+    for var in ('grad', 'active_mask'):
+        df[var] = result[var]
+    return df
+
+
+def glance_scipy_result(result):
+    """Tidy summary statistics from scipy's `OptimizeResult`.
+
+    Normally this function is not called directly but invoked by the
+    general purpose function :func:`glance`.
+
+    Arguments:
+        result (`OptimizeResult`): the fit result object.
+
+    Returns:
+        A DataFrame in tidy format with one row and several summary statistics
+        as columns.
+
+    Note:
+        The columns of the returned DataFrame are:
+
+        - `success` (bool): model name (only for `ModelResult`)
+        - `cost` (float): method used for the optimization (e.g. `leastsq`).
+        - `nfev` (int): number of objective function evaluations
+        - `njev` (int): number of jacobian function evaluations
+        - `status` (int): status returned by the fit routine
+        - `message` (string): message returned by the fit routine
+    """
+    attr_names_all = ['success', 'cost', 'nfev', 'njev', 'status', 'message']
+    attr_names = [a for a in attr_names_all if hasattr(result, a)]
+    d = pd.DataFrame(index=range(1), columns=attr_names)
+    for attr_name in attr_names:
+        d.loc[0, attr_name] = getattr(result, attr_name)
     return d
 
 
