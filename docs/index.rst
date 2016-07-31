@@ -35,6 +35,7 @@ for conversion between dictionaries and 2-columns tidy DataFrames.
 
 Currently, supported fit result object are:
 
+- `scipy.optimize.OptimizeResult`
 - `lmfit.model.ModelResult` (returned by `lmfit.Model.fit()`)
 - `lmfit.minimizer.MinimizerResult` (returned by `lmfit.minimizer()`)
 
