@@ -29,7 +29,13 @@ pybroom development was inspired by the R library
 See `this video <https://www.youtube.com/watch?v=eM3Ha0kTAz4>`__
 for details of the philosophy behind broom and pybroom.
 
-Like the R library broom, pybroom provides 3 functions: `tidy`, `augment` and `glance`.
+Like the R library broom, pybroom provides 3 functions: `glance`, `tidy` and
+`augment`. The `glance` function returns fit statistics, one for each
+fit result (e.g. fit method, number of iterations, chi-square etc.).
+The `tidy` function returns data for each fitted parameter
+(e.g. fitted value, gradient, bounds, etc.).
+The `augment` function returns data with the same size as the fitted
+data points (evaluated best-fit model, residuals, etc.).
 Additionally, pybroom has two functions `tidy_to_dict` and `dict_to_tidy`
 for conversion between dictionaries and 2-columns tidy DataFrames.
 
@@ -39,7 +45,12 @@ Currently, supported fit result object are:
 - `lmfit.model.ModelResult` (returned by `lmfit.Model.fit()`)
 - `lmfit.minimizer.MinimizerResult` (returned by `lmfit.minimizer()`)
 
-Support for `scipy.optimize` or objects used in other libraries such as
+Note that the 3 functions (glance, tidy and augment) are implemented only for
+the fit-result objects that are relevant. For example, `augment` cannot
+process lmfit's `MinimizerResult` or scipy's `OptimizeResult` because
+there is little or no data relevant to each data point.
+
+Support for objects used in other libraries such as
 `sklearn` can be added based on user request
 (`PR welcome! <https://github.com/tritemio/pybroom>`__).
 
@@ -50,8 +61,9 @@ Install pybroom with `pip` from the source folder::
 
     pip install .
 
-Dependencies are only pandas and lmfit (0.9.5+). However, matplotlib and
-seaborn are strongly recommended (and necessary to run the example notebooks).
+Dependencies are only pandas and lmfit (0.9.5+, which requires scipy).
+However, matplotlib and seaborn are strongly recommended (and necessary
+to run the example notebooks).
 
 
 .. toctree::
