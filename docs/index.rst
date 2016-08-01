@@ -57,11 +57,11 @@ Support for objects used in other libraries such as
 Installation
 ------------
 
-Install pybroom with `pip` from the source folder::
+Install pybroom with `pip` (python 3 only)::
 
-    pip install .
+    pip install pybroom
 
-Dependencies are only pandas and lmfit (0.9.5+, which requires scipy).
+Dependencies are only pandas and lmfit (0.9.5+, which in turn requires scipy).
 However, matplotlib and seaborn are strongly recommended (and necessary
 to run the example notebooks).
 

@@ -36,7 +36,7 @@ pybroom development was inspired by the R library
 See `this video <https://www.youtube.com/watch?v=eM3Ha0kTAz4>`__
 for details of the philosophy behind broom and pybroom.
 
-See the `pybroom homepage<http://pybroom.readthedocs.io/>`__ for more info.
+See the `pybroom homepage <http://pybroom.readthedocs.io/>`__ for more info.
 """
 
 setup(
