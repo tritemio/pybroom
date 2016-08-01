@@ -61,7 +61,7 @@ seaborn are strongly recommended (and necessary to run the example notebooks).
    notebooks/pybroom-example.ipynb
    notebooks/pybroom-example-multi-datasets.ipynb
    notebooks/pybroom-example-multi-datasets-minimize.ipynb
-   notebooks/pybroom-example-multi-datasets-scipy.ipynb
+   notebooks/pybroom-example-multi-datasets-scipy-robust-fit.ipynb
 
 .. toctree::
     :maxdepth: 1
