@@ -10,7 +10,7 @@ import lmfit
 __version__ = '0.2.dev0'
 
 
-def tidy(result, var_name='item', **kwargs):
+def tidy(result, var_names=None, **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
 
     A function to tidy any of the supported fit result
@@ -48,8 +48,8 @@ def tidy(result, var_name='item', **kwargs):
         :func:`tidy_lmfit_result` and :func:`tidy_scipy_result`.
     """
     # Find out what result is and call the relevant function
-    if isinstance(result, list):
-        return _multi_dataframe(result, tidy, var_name=var_name, **kwargs)
+    if isinstance(result, list) or isinstance(result, dict):
+        return _multi_dataframe(tidy, result, var_names, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return tidy_lmfit_result(result)
@@ -63,7 +63,7 @@ def tidy(result, var_name='item', **kwargs):
         raise NotImplementedError(msg % type(result))
 
 
-def glance(result, var_name='item', **kwargs):
+def glance(result, var_names=None, **kwargs):
     """Tidy DataFrame containing fit summaries from`result`.
 
     A function to tidy any of the supported fit result
@@ -96,8 +96,8 @@ def glance(result, var_name='item', **kwargs):
         arguments refer to the specialized tidying functions:
         :func:`glance_lmfit_result` and :func:`glance_scipy_result`.
     """
-    if isinstance(result, list):
-        return _multi_dataframe(result, glance, var_name=var_name, **kwargs)
+    if isinstance(result, list) or isinstance(result, dict):
+        return _multi_dataframe(glance, result, var_names, **kwargs)
     elif (isinstance(result, lmfit.model.ModelResult) or
           isinstance(result, lmfit.minimizer.MinimizerResult)):
         return glance_lmfit_result(result)
@@ -108,7 +108,7 @@ def glance(result, var_name='item', **kwargs):
         raise NotImplementedError(msg % type(result))
 
 
-def augment(result, var_name='item', **kwargs):
+def augment(result, var_names=None, **kwargs):
     """Tidy DataFrame containing fit data from `result`.
 
     A function to tidy any of the supported fit result
@@ -134,8 +134,8 @@ def augment(result, var_name='item', **kwargs):
         (`'item'` by default) contains the index of the object
         in the list.
     """
-    if isinstance(result, list):
-        return _multi_dataframe(result, augment, var_name=var_name, **kwargs)
+    if isinstance(result, list) or isinstance(result, dict):
+        return _multi_dataframe(result, augment, var_names, **kwargs)
     elif isinstance(result, lmfit.model.ModelResult):
         return _augment_lmfit_modelresult(result)
     else:
@@ -143,13 +143,48 @@ def augment(result, var_name='item', **kwargs):
         raise NotImplementedError(msg % type(result))
 
 
-def _multi_dataframe(results, func, var_name='item', **kwargs):
-    """Call `func` for each element in `results` and concatenate results.
+def _asdict_copy(results):
+    """Transform input into a OrderedDict and return a copy.
     """
-    d = []
-    for i, res in enumerate(results):
-        d.append(func(res, **kwargs))
-        d[-1][var_name] = i
+    if isinstance(results, list):
+        results = OrderedDict((k, v) for k, v in enumerate(results))
+    msg = ('The `results` argument needs to be a list or a dict.\n'
+           'It is a %s instead')
+    if not isinstance(results, dict):
+        raise ValueError(msg % type(results))
+    return results.copy()
+
+
+def _as_list_of_strings_copy(var_names):
+    """Transform input into a list of strings and return a copy.
+    """
+    if var_names is None:
+        msg = ('When input is list and/or dict, you need to pass `var_names` '
+               '(a list of strings) to specify the index/key column names.')
+        raise ValueError(msg)
+    elif isinstance(var_names, str):
+        var_names = var_names.split(' ')
+    return var_names.copy()
+
+
+def _multi_dataframe(func, results, var_names, **kwargs):
+    """Call `func` for each item in `results` and concatenate output.
+
+    Arguments:
+        func (function): function of the called on each element.
+            Chose between `glance`, `tidy` or `augment`.
+        results (dict or list): collection of fit results. It can be a list,
+            a dict or a nested structure such as a dict of lists.
+        var_names (list or string): names of dataframe columns used to index
+            the results. It can be a list of strings or single string with
+            space-separated names.
+    """
+    d = _asdict_copy(results)
+    var_names = _as_list_of_strings_copy(var_names)
+    var_name = var_names.pop(0)
+    for i, (key, res) in enumerate(results.items()):
+        d[key] = func(res, var_names, **kwargs)
+        d[key][var_name] = key
     return pd.concat(d, ignore_index=True)
 
 
