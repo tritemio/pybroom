@@ -1,15 +1,16 @@
 PyBroom API Documentation
 =========================
 
-.. module :: pybroom
+.. automodule :: pybroom
 
 Main Functions
 --------------
 
 The 3 high-level functions :func:`glance`, :func:`tidy` and :func:`augment`
-allows tidying one (or a list of) fit result(s).
+allows tidying one or more fit results.
 These are pybroom's most generic functions, accepting all the
-the supported fit result objects, as well as a list of such objects.
+the supported fit result objects, as well as a list/dict of such objects.
+See also the examples at the beginning of this page and the example notebooks.
 
 .. autofunction :: glance
 

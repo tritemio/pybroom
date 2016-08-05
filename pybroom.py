@@ -23,7 +23,7 @@ of fit results). The example below shows some use cases.
 
 Note:
     pybroom functions are particularly convenient when tidying a
-    set of fit results. The following examples are valid for
+    collection of fit results. The following examples are valid for
     all the 3 pybroom functions. If `results` is a list
     of datasets (e.g. data replicates), the returned dataframe will
     have an additional "index" column containing the index of the
@@ -48,7 +48,7 @@ Example:
     are used. The `glance` function is used as example but the same logic
     (and input arguments) can be also passsed to `tidy` and `augment`.
 
-    List of results::
+    Input is a list of fit results::
 
         >>> results = [fit_res1, fit_res2, fit_res3]
         >>> br.glance(results, var_names='dataset')
@@ -58,7 +58,7 @@ Example:
         1          6             101  0.00996431 -459.669        1
         2          6             101   0.0109456 -450.183        2
 
-    Dict of results::
+    Input is a dict of fit results::
 
         >>> results = {'A': fit_res1, 'B': fit_res2, 'C': fit_res3}
         >>> br.glance(results, var_names='dataset')
@@ -68,7 +68,7 @@ Example:
         1          6             101  0.00996431 -459.669        B
         2          6             101   0.0109456 -450.183        C
 
-    Dict of lists of results::
+    Input is a dict of lists of fit results::
 
         >>> results = {'A': [fit_res1, fit_res2], 'B': [fit_res3, fit_res4]}
         >>> br.glance(results, var_names=['function', 'dataset'])
@@ -386,7 +386,6 @@ def glance_scipy_result(result):
         - `status` (int): status returned by the fit routine
         - `message` (string): message returned by the fit routine
     """
-    #print('glance_scipy_result', type(result))
     attr_names_all = ['success', 'cost', 'nfev', 'njev', 'status', 'message']
     attr_names = [a for a in attr_names_all if hasattr(result, a)]
     d = pd.DataFrame(index=range(1), columns=attr_names)
