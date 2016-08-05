@@ -1,7 +1,86 @@
 #
 # Copyright (c) 2016 Antonino Ingargiola and contributors.
 #
+"""
+This module contains the 3 main pybroom's functions:
 
+- :func:`glance`
+- :func:`tidy`
+- :func:`augment`
+
+These functions take one or multiple fit results as input and return a
+"tidy" (or long-form) DataFrame.
+The `glance` function returns fit statistics, one for each
+fit result (e.g. fit method, number of iterations, chi-square etc.).
+The `tidy` function returns data for each fitted parameter
+(e.g. fitted value, gradient, bounds, etc.).
+The `augment` function returns data with the same size as the fitted
+data points (evaluated best-fit model, residuals, etc.).
+
+In the case of multiple fit results, pybroom functions accept a list, a
+dict or a nested structure of dict and lists (for example a dict of lists
+of fit results). The example below shows some use cases.
+
+Note:
+    pybroom functions are particularly convenient when tidying a
+    set of fit results. The following examples are valid for
+    all the 3 pybroom functions. If `results` is a list
+    of datasets (e.g. data replicates), the returned dataframe will
+    have an additional "index" column containing the index of the
+    dataset in the list. If `results` is a dict of fit results (e.g.
+    results from different fit methods or models on the same dataset),
+    then the "index" column contains the keys of the dict (each key
+    identifies a fit result). In the previous two example, `var_names`
+    should contains the name of the "index" column (a string).
+    Nested structures are also possible. For example, when fitting
+    a list of datasets with different methods, we can build a dict
+    of lists of fit results where the dict keys are the method names
+    and the items in the list are fit results for the different datasets.
+    In this case the returned dataframe has two additional "index"
+    columns: one with the dict keys and one with the list index.
+    The tuple (key, list index) identifies each single fit result.
+    In this case `var_names` should be a list of column names for
+    the keys and index column respectively (list of strings)
+
+
+Example:
+    The following examples shows pybroom output when multiple fit results
+    are used. The `glance` function is used as example but the same logic
+    (and input arguments) can be also passsed to `tidy` and `augment`.
+
+    List of results::
+
+        >>> results = [fit_res1, fit_res2, fit_res3]
+        >>> br.glance(results, var_names='dataset')
+
+          num_params num_data_points      redchi      AIC  dataset
+        0          6             101  0.00911793 -468.634        0
+        1          6             101  0.00996431 -459.669        1
+        2          6             101   0.0109456 -450.183        2
+
+    Dict of results::
+
+        >>> results = {'A': fit_res1, 'B': fit_res2, 'C': fit_res3}
+        >>> br.glance(results, var_names='dataset')
+
+          num_params num_data_points      redchi      AIC function
+        0          6             101  0.00911793 -468.634        A
+        1          6             101  0.00996431 -459.669        B
+        2          6             101   0.0109456 -450.183        C
+
+    Dict of lists of results::
+
+        >>> results = {'A': [fit_res1, fit_res2], 'B': [fit_res3, fit_res4]}
+        >>> br.glance(results, var_names=['function', 'dataset'])
+
+          num_params num_data_points      redchi      AIC  dataset function
+        0          6             101  0.00911793 -468.634        0        A
+        1          6             101  0.00996431 -459.669        1        A
+        2          6             101   0.0109456 -450.183        0        B
+        3          6             101   0.0176529 -401.908        1        B
+
+
+"""
 from collections import OrderedDict, namedtuple
 import pandas as pd
 import scipy.optimize as so
@@ -25,8 +104,9 @@ def tidy(result, var_names=None, **kwargs):
         result (fit result object or list): one of the supported fit result
             objects or a list of supported fit result objects. When a list,
             all the elements need to be of the same type.
-        var_name (string): name of the column containing an integer index
-            that is different for each element in the list of fit results.
+        var_names (string or list): name(s) of the column(s) containing
+            an "index" that is different for each element in the set of
+            fit results.
         param_names (string or list of string): names of the fitted parameters
             for fit results which don't include parameter's names
             (such as scipy's OptimizeResult). It can either be a list of
@@ -43,27 +123,27 @@ def tidy(result, var_names=None, **kwargs):
         in the list.
 
     See also:
-        For more information on the returned DataFrame and on additional
+        For more details on the returned DataFrame and on additional
         arguments refer to the specialized tidying functions:
         :func:`tidy_lmfit_result` and :func:`tidy_scipy_result`.
     """
     # Find out what result is and call the relevant function
-    if isinstance(result, list) or isinstance(result, dict):
-        return _multi_dataframe(tidy, result, var_names, **kwargs)
-    elif (isinstance(result, lmfit.model.ModelResult) or
-          isinstance(result, lmfit.minimizer.MinimizerResult)):
-        return tidy_lmfit_result(result)
-    elif isinstance(result, so.OptimizeResult):
+    if isinstance(result, so.OptimizeResult):
         if 'param_names' not in kwargs:
             msg = "The argument `param_names` is required for this input type."
             raise ValueError(msg)
         return tidy_scipy_result(result, **kwargs)
+    elif (isinstance(result, lmfit.model.ModelResult) or
+          isinstance(result, lmfit.minimizer.MinimizerResult)):
+        return tidy_lmfit_result(result)
+    elif isinstance(result, list) or isinstance(result, dict):
+        return _multi_dataframe(tidy, result, var_names, **kwargs)
     else:
         msg = 'Sorry, `tidy` does not support this fit result object (%s)'
         raise NotImplementedError(msg % type(result))
 
 
-def glance(result, var_names=None, **kwargs):
+def glance(results, var_names=None, **kwargs):
     """Tidy DataFrame containing fit summaries from`result`.
 
     A function to tidy any of the supported fit result
@@ -78,8 +158,9 @@ def glance(result, var_names=None, **kwargs):
         result (fit result object or list): one of the supported fit result
             objects or a list of supported fit result objects. When a list,
             all the elements need to be of the same type.
-        var_name (string): name of the column containing an integer index
-            that is different for each element in the list of fit results.
+        var_names (string or list): name(s) of the column(s) containing
+            an "index" that is different for each element in the set of
+            fit results.
         **kwargs: additional arguments passed to the underlying specialized
             tidying function.
 
@@ -92,37 +173,40 @@ def glance(result, var_names=None, **kwargs):
         in the list.
 
     See also:
-        For more information on the returned DataFrame and on additional
+        For more details on the returned DataFrame and on additional
         arguments refer to the specialized tidying functions:
         :func:`glance_lmfit_result` and :func:`glance_scipy_result`.
     """
-    if isinstance(result, list) or isinstance(result, dict):
-        return _multi_dataframe(glance, result, var_names, **kwargs)
-    elif (isinstance(result, lmfit.model.ModelResult) or
-          isinstance(result, lmfit.minimizer.MinimizerResult)):
-        return glance_lmfit_result(result)
-    elif isinstance(result, so.OptimizeResult):
-        return glance_scipy_result(result, **kwargs)
+    if isinstance(results, so.OptimizeResult):
+        return glance_scipy_result(results, **kwargs)
+    elif (isinstance(results, lmfit.model.ModelResult) or
+          isinstance(results, lmfit.minimizer.MinimizerResult)):
+        return glance_lmfit_result(results)
+    elif isinstance(results, list) or isinstance(results, dict):
+        return _multi_dataframe(glance, results, var_names, **kwargs)
     else:
         msg = 'Sorry, `glance` does not support this fit result object (%s)'
-        raise NotImplementedError(msg % type(result))
+        raise NotImplementedError(msg % type(results))
 
 
-def augment(result, var_names=None, **kwargs):
+def augment(results, var_names=None, **kwargs):
     """Tidy DataFrame containing fit data from `result`.
 
     A function to tidy any of the supported fit result
     (or a list of fit results). This function will identify input type
     and call the relative "specialized" tidying function. When the input
-    is a list, the returned DataFrame contains data from all the fit
-    results.
+    is a list or a dict of fit results, the returned DataFrame contains
+    data from all the fit results. In this case data from different fit
+    results is identified by the values in the additional "index"
+    (or categorical) column(s) whose name(s) are specified in `var_names`.
 
     Arguments:
-        result (fit result object or list): one of the supported fit result
+        results (fit result object or list): one of the supported fit result
             objects or a list of supported fit result objects. When a list,
             all the elements need to be of the same type.
-        var_name (string): name of the column containing an integer index
-            that is different for each element in the list of fit results.
+        var_names (string or list): name(s) of the column(s) containing
+            an "index" that is different for each element in the set of
+            fit results. See the example section below.
         **kwargs: additional arguments passed to the underlying specialized
             tidying function.
 
@@ -133,14 +217,15 @@ def augment(result, var_names=None, **kwargs):
         When a list of fit-result objects is passed, the column `var_name`
         (`'item'` by default) contains the index of the object
         in the list.
+
     """
-    if isinstance(result, list) or isinstance(result, dict):
-        return _multi_dataframe(result, augment, var_names, **kwargs)
-    elif isinstance(result, lmfit.model.ModelResult):
-        return _augment_lmfit_modelresult(result)
+    if isinstance(results, lmfit.model.ModelResult):
+        return _augment_lmfit_modelresult(results)
+    elif isinstance(results, list) or isinstance(results, dict):
+        return _multi_dataframe(augment, results, var_names, **kwargs)
     else:
         msg = 'Sorry, `augment` does not support this fit result object (%s)'
-        raise NotImplementedError(msg % type(result))
+        raise NotImplementedError(msg % type(results))
 
 
 def _asdict_copy(results):
@@ -155,34 +240,54 @@ def _asdict_copy(results):
     return results.copy()
 
 
-def _as_list_of_strings_copy(var_names):
+def _as_list_of_strings_copy(var_names, nlevels):
     """Transform input into a list of strings and return a copy.
     """
     if var_names is None:
-        msg = ('When input is list and/or dict, you need to pass `var_names` '
-               '(a list of strings) to specify the index/key column names.')
-        raise ValueError(msg)
-    elif isinstance(var_names, str):
-        var_names = var_names.split(' ')
+        if nlevels == 1:
+            var_names = 'item'
+        else:
+            msg = ('When input is list and/or dict, you need to pass `var_names` '
+                   '(a list of strings) to specify the index/key column names.')
+            raise ValueError(msg)
+
+    if isinstance(var_names, str):
+        var_names = [var_names]
     return var_names.copy()
+
+
+def _get_nlevels(results):
+    """Return number of nested levels in `results`.
+    """
+    n = 0
+    r = results
+    while isinstance(r, list) or isinstance(r, dict):
+        n += 1
+        k = 0 if isinstance(r, list) else list(r.keys())[0]
+        r = r[k]
+    return n
 
 
 def _multi_dataframe(func, results, var_names, **kwargs):
     """Call `func` for each item in `results` and concatenate output.
 
     Arguments:
-        func (function): function of the called on each element.
+        func (function): function of the called on each element of `results`.
             Chose between `glance`, `tidy` or `augment`.
         results (dict or list): collection of fit results. It can be a list,
             a dict or a nested structure such as a dict of lists.
         var_names (list or string): names of dataframe columns used to index
-            the results. It can be a list of strings or single string with
-            space-separated names.
+            the results. It can be a list of strings or single string in case
+            only one categorical "index" is needed (i.e. a string is equivalent
+            to a 1-element list of strings).
     """
+    if isinstance(results, so.OptimizeResult):
+        raise ValueError()
     d = _asdict_copy(results)
-    var_names = _as_list_of_strings_copy(var_names)
+    nlevels = _get_nlevels(results)
+    var_names = _as_list_of_strings_copy(var_names, nlevels)
     var_name = var_names.pop(0)
-    for i, (key, res) in enumerate(results.items()):
+    for i, (key, res) in enumerate(d.items()):
         d[key] = func(res, var_names, **kwargs)
         d[key][var_name] = key
     return pd.concat(d, ignore_index=True)
@@ -281,6 +386,7 @@ def glance_scipy_result(result):
         - `status` (int): status returned by the fit routine
         - `message` (string): message returned by the fit routine
     """
+    #print('glance_scipy_result', type(result))
     attr_names_all = ['success', 'cost', 'nfev', 'njev', 'status', 'message']
     attr_names = [a for a in attr_names_all if hasattr(result, a)]
     d = pd.DataFrame(index=range(1), columns=attr_names)
