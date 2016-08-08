@@ -17,7 +17,8 @@ in tidy format
 DataFrames in tidy format (or long-form) follow a simple rule:
 one "observation" per row and one "variable" per column.
 This simple structure makes it easy to process the data with clear and
-well-understood idioms (for filtering, aggregation, etc.) and allows
+`well-understood idioms <http://tomaugspurger.github.io/modern-5-tidy.html>`__
+(for filtering, aggregation, etc.) and allows
 plot libraries to automatically generate complex plots in which many
 variables are compared. Plotting libraries supporting tidy DataFrames
 include `seaborn <https://web.stanford.edu/~mwaskom/software/seaborn/>`__,

@@ -61,4 +61,4 @@ setup(
                  'Topic :: Scientific/Engineering',
                  'License :: OSI Approved :: MIT License'],
     py_modules=['pybroom'],
-    keywords=('dataframe tidy-data long-form model fitting'))
+    keywords=('dataframe tidy-data long-form model fitting tidyverse'))
