@@ -139,7 +139,7 @@ def tidy(result, var_names='key', **kwargs):
     elif isinstance(result, list) or isinstance(result, dict):
         return _multi_dataframe(tidy, result, var_names, **kwargs)
     else:
-        msg = 'Sorry, `tidy` does not support this fit result object (%s)'
+        msg = 'Sorry, `tidy` does not support this object type (%s)'
         raise NotImplementedError(msg % type(result))
 
 
@@ -185,7 +185,7 @@ def glance(results, var_names='key', **kwargs):
     elif isinstance(results, list) or isinstance(results, dict):
         return _multi_dataframe(glance, results, var_names, **kwargs)
     else:
-        msg = 'Sorry, `glance` does not support this fit result object (%s)'
+        msg = 'Sorry, `glance` does not support this object type (%s)'
         raise NotImplementedError(msg % type(results))
 
 
@@ -224,7 +224,7 @@ def augment(results, var_names='key', **kwargs):
     elif isinstance(results, list) or isinstance(results, dict):
         return _multi_dataframe(augment, results, var_names, **kwargs)
     else:
-        msg = 'Sorry, `augment` does not support this fit result object (%s)'
+        msg = 'Sorry, `augment` does not support this object type (%s)'
         raise NotImplementedError(msg % type(results))
 
 
