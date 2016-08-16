@@ -51,7 +51,7 @@ the fit-result objects that are relevant. For example, `augment` cannot
 process lmfit's `MinimizerResult` or scipy's `OptimizeResult` because
 there is little or no data relevant to each data point.
 
-Support for objects used in other libraries such as
+Support for result objects from other libraries such as
 `sklearn` can be added based on user request
 (`PR welcome! <https://github.com/tritemio/pybroom>`__).
 
