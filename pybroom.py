@@ -89,7 +89,7 @@ import lmfit
 __version__ = '0.2.dev0'
 
 
-def tidy(result, var_names=None, **kwargs):
+def tidy(result, var_names='key', **kwargs):
     """Tidy DataFrame containing fitted parameter data from `result`.
 
     A function to tidy any of the supported fit result
@@ -143,7 +143,7 @@ def tidy(result, var_names=None, **kwargs):
         raise NotImplementedError(msg % type(result))
 
 
-def glance(results, var_names=None, **kwargs):
+def glance(results, var_names='key', **kwargs):
     """Tidy DataFrame containing fit summaries from`result`.
 
     A function to tidy any of the supported fit result
@@ -189,7 +189,7 @@ def glance(results, var_names=None, **kwargs):
         raise NotImplementedError(msg % type(results))
 
 
-def augment(results, var_names=None, **kwargs):
+def augment(results, var_names='key', **kwargs):
     """Tidy DataFrame containing fit data from `result`.
 
     A function to tidy any of the supported fit result
@@ -228,44 +228,21 @@ def augment(results, var_names=None, **kwargs):
         raise NotImplementedError(msg % type(results))
 
 
-def _asdict_copy(results):
-    """Transform input into a OrderedDict and return a copy.
+def _as_odict_copy(results):
+    """Transform input into a OrderedDict, if needed. Returns a copy.
     """
-    if isinstance(results, list):
-        results = OrderedDict((k, v) for k, v in enumerate(results))
-    msg = ('The `results` argument needs to be a list or a dict.\n'
-           'It is a %s instead')
-    if not isinstance(results, dict):
-        raise ValueError(msg % type(results))
-    return results.copy()
+    iterator = enumerate(results)
+    if isinstance(results, dict):
+        iterator = results.items()
+    return OrderedDict((k, v) for k, v in iterator)
 
 
-def _as_list_of_strings_copy(var_names, nlevels):
-    """Transform input into a list of strings and return a copy.
+def _as_list_of_strings_copy(var_names):
+    """Transform input into a list of strings, if needed. Returns a copy.
     """
-    if var_names is None:
-        if nlevels == 1:
-            var_names = 'item'
-        else:
-            msg = ('When input is list and/or dict, you need to pass `var_names` '
-                   '(a list of strings) to specify the index/key column names.')
-            raise ValueError(msg)
-
     if isinstance(var_names, str):
         var_names = [var_names]
     return var_names.copy()
-
-
-def _get_nlevels(results):
-    """Return number of nested levels in `results`.
-    """
-    n = 0
-    r = results
-    while isinstance(r, list) or isinstance(r, dict):
-        n += 1
-        k = 0 if isinstance(r, list) else list(r.keys())[0]
-        r = r[k]
-    return n
 
 
 def _multi_dataframe(func, results, var_names, **kwargs):
@@ -282,10 +259,13 @@ def _multi_dataframe(func, results, var_names, **kwargs):
             to a 1-element list of strings).
     """
     if isinstance(results, so.OptimizeResult):
-        raise ValueError()
-    d = _asdict_copy(results)
-    nlevels = _get_nlevels(results)
-    var_names = _as_list_of_strings_copy(var_names, nlevels)
+        raise ValueError('Input argument has wrong type: `OptimizeResult`.')
+    if len(var_names) == 0:
+        msg = ('The list `var_names` is too short. Its length should be equal '
+               'to the nesting levels in `results`.')
+        raise ValueError(msg)
+    d = _as_odict_copy(results)
+    var_names = _as_list_of_strings_copy(var_names)
     var_name = var_names.pop(0)
     for i, (key, res) in enumerate(d.items()):
         d[key] = func(res, var_names, **kwargs)
