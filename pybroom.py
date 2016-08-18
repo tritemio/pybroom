@@ -270,7 +270,9 @@ def _multi_dataframe(func, results, var_names, **kwargs):
     for i, (key, res) in enumerate(d.items()):
         d[key] = func(res, var_names, **kwargs)
         d[key][var_name] = key
-    return pd.concat(d, ignore_index=True)
+    df = (pd.concat(d, ignore_index=True)
+            .assign(**{var_name: lambda x: pd.Categorical(x[var_name])}))
+    return df
 
 
 def tidy_lmfit_result(result):
