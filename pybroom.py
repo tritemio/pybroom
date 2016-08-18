@@ -307,7 +307,7 @@ def tidy_lmfit_result(result):
         # Derived parameters may not have init value
         if name in result.init_values:
             d.loc[i, 'init_value'] = result.init_values[name]
-    return d
+    return d.apply(pd.to_numeric, errors='ignore')
 
 
 def tidy_scipy_result(result, param_names, **kwargs):
@@ -371,7 +371,7 @@ def glance_scipy_result(result):
     d = pd.DataFrame(index=range(1), columns=attr_names)
     for attr_name in attr_names:
         d.loc[0, attr_name] = getattr(result, attr_name)
-    return d
+    return d.apply(pd.to_numeric, errors='ignore')
 
 
 def glance_lmfit_result(result):
@@ -427,7 +427,7 @@ def glance_lmfit_result(result):
     if hasattr(result, 'kws') and result.kws is not None:
         for key, value in result.kws.items():
             d['_'.join((result.method, key))] = value
-    return d
+    return d.apply(pd.to_numeric, errors='ignore')
 
 
 def _augment_lmfit_modelresult(result):
@@ -453,7 +453,7 @@ def _augment_lmfit_modelresult(result):
         comp_names = [c.name for c in result.components]
         for cname, comp in zip(comp_names, result.components):
             d.loc[:, cname] = comp.eval(x=d.x, **result.values)
-    return d
+    return d.apply(pd.to_numeric, errors='ignore')
 
 
 def tidy_to_dict(df, key='name', value='value', keys_exclude=None,
