@@ -246,17 +246,28 @@ def _as_list_of_strings_copy(var_names):
 
 
 def _multi_dataframe(func, results, var_names, **kwargs):
-    """Call `func` for each item in `results` and concatenate output.
+    """Recursively call `func` on each item in `results` and concatenate output.
+
+    Usually `func` is :func:`glance`, :func:`tidy` or :func:`augment`.
+    The function `func` is also the calling function, therefore this implements
+    a recursion which unpacks the nested `results` structure (a tree) and
+    builds a global tidy DataFrame with "key" columns corresponding to
+    the `results` structure.
 
     Arguments:
         func (function): function of the called on each element of `results`.
             Chose between `glance`, `tidy` or `augment`.
         results (dict or list): collection of fit results. It can be a list,
             a dict or a nested structure such as a dict of lists.
-        var_names (list or string): names of dataframe columns used to index
+        var_names (list or string): names of DataFrame columns used to index
             the results. It can be a list of strings or single string in case
             only one categorical "index" is needed (i.e. a string is equivalent
             to a 1-element list of strings).
+
+    Returns:
+        "Tidy" DataFrame merging data from all the items in `results`.
+        Necessary "key" columns are added to encode layout of fitting result
+        objects in `results`.
     """
     if isinstance(results, so.OptimizeResult):
         raise ValueError('Input argument has wrong type: `OptimizeResult`.')
