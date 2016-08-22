@@ -82,6 +82,7 @@ Example:
 
 """
 from collections import OrderedDict, namedtuple
+import numpy as np
 import pandas as pd
 import scipy.optimize as so
 import lmfit
@@ -341,10 +342,13 @@ def tidy_scipy_result(result, param_names, **kwargs):
         A DataFrame in tidy format with one row for each parameter.
 
     Note:
-        The columns of the returned DataFrame are:
+        These two columns are always present in the returned DataFrame:
 
         - `name` (string): name of the parameter.
         - `value` (number): value of the parameter after the optimization.
+
+        Optional columns (depending on the type of result) are:
+
         - `grad` (float): gradient for each parameter
         - `active_mask` (int)
     """
@@ -352,7 +356,8 @@ def tidy_scipy_result(result, param_names, **kwargs):
     params = Params(*result.x)
     df = dict_to_tidy(params._asdict(), **kwargs)
     for var in ('grad', 'active_mask'):
-        df[var] = result[var]
+        if hasattr(result, var):
+            df[var] = result[var]
     return df
 
 
@@ -370,17 +375,23 @@ def glance_scipy_result(result):
         as columns.
 
     Note:
-        The columns of the returned DataFrame are:
+        Possible columns of the returned DataFrame include:
 
-        - `success` (bool): model name (only for `ModelResult`)
-        - `cost` (float): method used for the optimization (e.g. `leastsq`).
+        - `success` (bool): whether the fit succeed
+        - `cost` (float): cost function
+        - `optimality` (float): optimality parameter as returned by
+          scipy.optimize.least_squares.
         - `nfev` (int): number of objective function evaluations
         - `njev` (int): number of jacobian function evaluations
+        - `nit` (int): number of iterations
         - `status` (int): status returned by the fit routine
         - `message` (string): message returned by the fit routine
     """
-    attr_names_all = ['success', 'cost', 'nfev', 'njev', 'status', 'message']
+    attr_names_all = ['success', 'cost', 'optimality', 'nfev', 'njev', 'nit'
+                      'status', 'message']
     attr_names = [a for a in attr_names_all if hasattr(result, a)]
+    if hasattr(result, 'fun') and np.size(result.fun) == 1:
+        attr_names.append('fun')
     d = pd.DataFrame(index=range(1), columns=attr_names)
     for attr_name in attr_names:
         d.loc[0, attr_name] = getattr(result, attr_name)
