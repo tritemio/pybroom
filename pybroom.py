@@ -61,7 +61,7 @@ Example:
     Input is a dict of fit results::
 
         >>> results = {'A': fit_res1, 'B': fit_res2, 'C': fit_res3}
-        >>> br.glance(results, var_names='dataset')
+        >>> br.glance(results, var_names='function')
 
           num_params num_data_points      redchi      AIC function
         0          6             101  0.00911793 -468.634        A
@@ -282,8 +282,12 @@ def _multi_dataframe(func, results, var_names, **kwargs):
     for i, (key, res) in enumerate(d.items()):
         d[key] = func(res, var_names, **kwargs)
         d[key][var_name] = key
-    df = (pd.concat(d, ignore_index=True)
-            .assign(**{var_name: lambda x: pd.Categorical(x[var_name])}))
+    df = pd.concat(d, ignore_index=True)
+    # Convert "key" column to categorical only if input was dict-type
+    # not list/tuple.
+    if isinstance(results, dict):
+        kw = {var_name: lambda x: pd.Categorical(x[var_name], ordered=True)}
+        df = df.assign(**kw)
     return df
 
 
