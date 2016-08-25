@@ -80,6 +80,7 @@ to run the example notebooks).
     :maxdepth: 1
     :caption: Reference
 
+    whatsnew
     api
 
 
