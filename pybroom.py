@@ -87,7 +87,7 @@ import pandas as pd
 import scipy.optimize as so
 import lmfit
 
-__version__ = '0.2.dev0'
+__version__ = '0.2.rc1'
 
 
 def tidy(result, var_names='key', **kwargs):
