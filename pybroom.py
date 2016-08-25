@@ -549,7 +549,7 @@ def dict_to_tidy(dc, key='name', value='value', keys_exclude=None,
 
     See also: :func:`tidy_to_dict`.
     """
-    keys = dc.keys()
+    keys = dc.keys()  # this is a set
     if keys_exclude is not None:
         keys -= keys_exclude
     keys = sorted(keys)
