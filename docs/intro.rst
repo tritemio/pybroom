@@ -1,8 +1,8 @@
 Why Pybroom?
 ============
 
-Which problem we are trying to solve?
-------------------------------------
+The Problem
+-----------
 
 DataFrames in tidy format (or long-form) follow a simple rule:
 one "observation" per row and one "variable" per column.
@@ -19,6 +19,7 @@ recent versions of `matplotlib <http://matplotlib.org/>`__,
 But, while data is oftentimes represented in tidy DataFrames, fit results
 are usually stored in a variety of custom objects and are harder
 to manipulate, compare and plot.
+
 
 Pybroom to the rescue!
 ----------------------
