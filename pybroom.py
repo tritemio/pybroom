@@ -525,8 +525,7 @@ def tidy_to_dict(df, key='name', value='value', keys_exclude=None,
             for var in keys_list}
 
 
-def dict_to_tidy(dc, key='name', value='value', keys_exclude=None,
-                 value_type=None):
+def dict_to_tidy(dc, key='name', value='value', keys_exclude=None):
     """Convert a dictionary into a tidy DataFrame.
 
     This function converts a dictionary into a "tidy" (or long-form)
