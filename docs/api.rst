@@ -1,4 +1,4 @@
-PyBroom API Documentation
+Pybroom API Documentation
 =========================
 
 .. automodule :: pybroom
