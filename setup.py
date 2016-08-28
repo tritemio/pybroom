@@ -34,6 +34,7 @@ See the `pybroom homepage <http://pybroom.readthedocs.io/>`__ for more info.
 setup(
     name='pybroom',
     version=get_version(),
+    py_modules=['pybroom'],
     #version=versioneer.get_version(),
     #cmdclass=versioneer.get_cmdclass(),
     author='Antonino Ingargiola',
@@ -41,6 +42,7 @@ setup(
     url='http://pybroom.readthedocs.io/',
     download_url='https://github.com/tritemio/pybroom',
     install_requires=['pandas', 'lmfit', 'setuptools'],
+    include_package_data=True,
     license='MIT',
     description=("Make tidy DataFrames from messy fit/model results."),
     long_description=long_description,
@@ -52,5 +54,4 @@ setup(
                  'Programming Language :: Python :: 3.5',
                  'Topic :: Scientific/Engineering',
                  'License :: OSI Approved :: MIT License'],
-    py_modules=['pybroom'],
     keywords=('dataframe tidy-data long-form model fitting tidyverse'))
