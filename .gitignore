@@ -1,8 +1,8 @@
 .ipynb_checkpoints
 *.pyc
-docs/_build
+doc/_build
 build
 *.egg-info
 dist
 recipe
-docs/notebooks/_*
+doc/notebooks/_*
