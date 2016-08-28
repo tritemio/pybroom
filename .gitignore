@@ -4,3 +4,5 @@ docs/_build
 build
 *.egg-info
 dist
+recipe
+docs/notebooks/_*
