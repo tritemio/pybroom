@@ -41,7 +41,7 @@ setup(
     author_email='tritemio@gmail.com',
     url='http://pybroom.readthedocs.io/',
     download_url='https://github.com/tritemio/pybroom',
-    install_requires=['pandas', 'lmfit', 'setuptools'],
+    install_requires=['pandas', 'lmfit'],
     include_package_data=True,
     license='MIT',
     description=("Make tidy DataFrames from messy fit/model results."),
