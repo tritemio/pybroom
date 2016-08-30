@@ -25,11 +25,15 @@ supporting tidy DataFrames.
 Installation
 ------------
 
-Install pybroom with `pip` (python 3 only)::
+You can install pybroom from PyPI using the following command::
 
     pip install pybroom
 
-Dependencies are only pandas and lmfit (0.9.5+, which in turn requires scipy).
+or from `conda-forge <https://conda-forge.github.io/>`__ using::
+
+    conda install -c conda-forge pybroom
+
+Dependencies are python 3.4+, pandas and lmfit (0.9.5+, which in turn requires scipy).
 However, matplotlib and seaborn are strongly recommended (and necessary
 to run the example notebooks).
 
